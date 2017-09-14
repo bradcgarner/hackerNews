@@ -26,7 +26,7 @@ app.post('/api/stories', (req, res) => {
   // It should respond with a 201 Created status and the story // WHAT MEANT BY STORY????
     .then((story)=>{
       console.log('returning posted data', story);
-      res.status(200).json(
+      res.status(201).json(
         story[0]
       );
     }); 
@@ -34,6 +34,18 @@ app.post('/api/stories', (req, res) => {
   // Using Postman to add some stories
   // Using the shell to make sure they were added to the database
 });
+
+app.get('/api/stories', (req, res) =>{
+  knex('news')
+    .select()
+    .orderBy('votes', 'desc')
+    .limit(20)
+    .returning(['id','title','url','votes'])
+    .then((story) => {
+      res.status(200).json(story);
+    });
+});
+
 
 let server;
 let knex;
