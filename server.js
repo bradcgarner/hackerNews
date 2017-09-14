@@ -12,8 +12,23 @@ const app = express();
 app.use(morgan(':method :url :res[location] :status')); // what is 'common' setting?
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-
+app.post('/api/stories', (req, res) => {
+  // validate data from user first before knex
+  let {title, votes, url } = req.body;
+  // Sending a votes property should not allow users to cheat the system by setting an arbitrary number of upvotes 
+  votes = null; // are we allowing votes?
+  knex('news')
+    .insert({
+      title: title,
+      url: url,
+      votes: votes,
+    })
+   // It should respond with a 201 Created status and the story // WHAT MEANT BY STORY????
+    .then(()=>res.status(201).send('Created');
+  
+  // Test your endpoint by:
+  // Using Postman to add some stories
+  // Using the shell to make sure they were added to the database
 });
 
 let server;
