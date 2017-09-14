@@ -14,18 +14,22 @@ app.use(bodyParser.json());
 
 app.post('/api/stories', (req, res) => {
   // validate data from user first before knex
-  let {title, votes, url } = req.body;
+  let {title, url } = req.body;
   // Sending a votes property should not allow users to cheat the system by setting an arbitrary number of upvotes 
-  votes = null; // are we allowing votes?
+  
   knex('news')
     .insert({
       title: title,
-      url: url,
-      votes: votes,
+      url: url
     })
-   // It should respond with a 201 Created status and the story // WHAT MEANT BY STORY????
-    .then(()=>res.status(201).send('Created');
-  
+    .returning(['id','title','url'])
+  // It should respond with a 201 Created status and the story // WHAT MEANT BY STORY????
+    .then((story)=>{
+      console.log('returning posted data', story);
+      res.status(200).json(
+        story[0]
+      );
+    }); 
   // Test your endpoint by:
   // Using Postman to add some stories
   // Using the shell to make sure they were added to the database
