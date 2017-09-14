@@ -40,9 +40,17 @@ app.get('/api/stories', (req, res) =>{
     .select()
     .orderBy('votes', 'desc')
     .limit(20)
-    .returning(['id','title','url','votes'])
     .then((story) => {
       res.status(200).json(story);
+    });
+});
+
+app.put('/api/stories/:id', (req, res) => {
+  knex('news')
+    .increment('votes')
+    .where('id', req.params.id)
+    .then(() => {
+      res.sendStatus(204);
     });
 });
 
