@@ -19,6 +19,8 @@ app.get('/', (req, res) => {
 let server;
 let knex;
 
+// general mocha question: how is the folder "test" mapped?
+
 function runServer(database = DATABASE, port = PORT) {
   return new Promise((resolve, reject) => {
     try {
