@@ -36,21 +36,29 @@ app.post('/api/stories', (req, res) => {
 });
 
 app.get('/api/stories', (req, res) =>{
-  // let arrOfStories = []; // final array of stories to return
-  // let objOfStories = {}; // keeps track of keys
+  let arrOfStories = []; // final array of stories to return
+  let objOfStories = {}; // keeps track of keys
   knex('news')
-    .select('title', 'url', 'votes', 'tags.name as tag')
+    .select('news.id as id','title', 'url', 'votes', 'tags.name as tag', 'tags.id as tagId')
     .select(knex.raw("CONCAT (author.name_first, ' ', author.name_last) as author"))
     .innerJoin('news_tags', 'news.id', 'news_tags.id_news')
     .innerJoin('tags', 'news_tags.id_tags', 'tags.id')
     .innerJoin('author', 'news.id_author', 'author.id')
     .orderBy('title')
-    // if the story is not already in the array, push it to the array
-    // .then()
-
-    // in all cases, push the tags to the story object (in the array)
-
-
+    .then((results) => {
+      results.forEach((story) => {
+        // if the story is not already in the array, push it to the array
+        if (!(story.id in objOfStories)) { // if the id is not a property [in] objOfStories
+          story.tags = [];
+          objOfStories[story.id] = story; // we just 'made a note' that we logged that story
+          arrOfStories.push(story);
+        }
+        // in all cases, push the tags to the story object (in the array)
+        objOfStories[story.id].tags.push({id: story.tagId, name: story.tag});
+      });      
+      console.log(objOfStories);
+      return arrOfStories;
+    })
 
     .then((story) => {
       res.status(200).json(story);
