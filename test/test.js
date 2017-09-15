@@ -10,80 +10,54 @@ chai.use(chaiHttp);
 const knex = require('knex')(DATABASE);
 
 function seedData() {
-  return knex('news')
+  return knex('news') // seedData needs to return a promise, so we need to return knex(). Otherwise seedData returns undefined.
     .insert([
-      {
-        title: 'Fake News',
+      {title: 'Fake News',
         url: 'www.foxnews.com',
-        votes: 600
-      },
-      {
-        title: 'My News',
+        votes: 600},
+      {title: 'My News',
         url: 'www.mynews.com',
-        votes: 3
-      },
-      {
-        title: 'Early News',
+        votes: 3},
+      {title: 'Early News',
         url: 'www.tooearly.com',
-        votes: 5
-      },
-      {
-        title: 'Montana State Police News',
+        votes: 5},
+      {title: 'Montana State Police News',
         url: 'www.idriveveryfast.com',
-        votes: 88
-      },
-      {
-        title: 'Bigly Yuge News!',
+        votes: 88},
+      {title: 'Bigly Yuge News!',
         url: 'www.forreal.com',
-        votes: 108353
-      },
-      {
-        title: 'How To Skin A Catfish',
+        votes: 108353},
+      {title: 'How To Skin A Catfish',
         url: 'www.whatilearnedasakid.com',
-        votes: 365
-      },
-      {
-        title: 'Everything You Need To Know',
+        votes: 365},
+      {title: 'Everything You Need To Know',
         url: 'www.eyntk.io',
-        votes: 8753
-      },
-      {
-        title: 'Tired of News?',
+        votes: 8753},
+      {title: 'Tired of News?',
         url: 'www.getsomesleep.net',
-        votes: 352
-      },
-      {
-        title: 'News Your Crazy Uncle Watches',
+        votes: 352},
+      {title: 'News Your Crazy Uncle Watches',
         url: 'www.crazy.com',
-        votes: 666
-      }]
+        votes: 666}]
     );
-   
-
-
-  //console.info('We need to create test data here');
 }
 
-
 describe('Hacker News API', function() {
-  before(function () {
-    return runServer();
+  before(function () { // mocha's describe.before function expects to return promises. We do not end the promises with .then() because that is built into Mocha.
+    return runServer(); // runServer() returns a promise (though hard to see)
   });
 
   beforeEach(function () {
-    return seedData();
-    
-    
+    return seedData(); // similar to above, but nested. seedData() must return a promise as well.
   });
 
   afterEach(function () {
-    return knex('news')
+    return knex('news') // knex returns promisable objects, not technically promises until the promise is called (usually via a .then() method). Because mocha has built-in chaining of promises, we do not need to call a .then() here.
       .del();
-      
   });
 
   after(function () {
-    return closeServer();
+    return closeServer(); // closeServer() returns a promise (and easy to see)
   });
 
   describe('Start Test Suite', function() {
