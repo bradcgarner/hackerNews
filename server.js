@@ -36,10 +36,22 @@ app.post('/api/stories', (req, res) => {
 });
 
 app.get('/api/stories', (req, res) =>{
+  // let arrOfStories = []; // final array of stories to return
+  // let objOfStories = {}; // keeps track of keys
   knex('news')
-    .select()
-    .orderBy('votes', 'desc')
-    .limit(20)
+    .select('title', 'url', 'votes', 'tags.name as tag')
+    .select(knex.raw("CONCAT (author.name_first, ' ', author.name_last) as author"))
+    .innerJoin('news_tags', 'news.id', 'news_tags.id_news')
+    .innerJoin('tags', 'news_tags.id_tags', 'tags.id')
+    .innerJoin('author', 'news.id_author', 'author.id')
+    .orderBy('title')
+    // if the story is not already in the array, push it to the array
+    // .then()
+
+    // in all cases, push the tags to the story object (in the array)
+
+
+
     .then((story) => {
       res.status(200).json(story);
     });
