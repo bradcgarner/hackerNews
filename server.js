@@ -65,14 +65,54 @@ app.get('/api/stories', (req, res) =>{
     });
 });
 
+// what is being put? Stories are existing, we are updating story and tags?
 app.put('/api/stories/:id', (req, res) => {
+  let id = req.params.id;
   knex('news')
-    .increment('votes')
+    .update({
+      title: req.body.title, // if req.body.title is undefined, this line is skipped
+      url: req.body.url
+    })
     .where('id', req.params.id)
     .then(() => {
+      if (req.body.votes === 1) {
+        console.log('logging votes',req.body.votes);
+        return knex('news')
+          .increment('votes')
+          .where('id', req.params.id);
+      } else if (req.body.votes === -1) {
+        return knex('news')
+          .increment('votes' -1)
+          .where('id', req.params.id);
+      }
+    })
+    .then(() => { // delete all tags for this story
+      console.log('logging id',id);
+      return knex('news_tags')
+        .where('id_news', id)
+        .del();
+    })
+    .then(()=>{
+      const arrayOfPromises = req.body.tags.map(tag => {
+        return knex('news_tags')
+          .insert({id_news: id, id_tags: tag});
+      });
+      return Promise.all(arrayOfPromises);
+    })
+    .then(()=>{
       res.sendStatus(204);
     });
 });
+
+//Old version that increments votes
+// app.put('/api/stories/:id', (req, res) => {
+//   knex('news')
+//     .increment('votes')
+//     .where('id', req.params.id)
+//     .then(() => {
+//       res.sendStatus(204);
+//     });
+// });
 
 
 let server;
